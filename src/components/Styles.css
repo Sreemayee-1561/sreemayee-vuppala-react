@@ -1,0 +1,46 @@
+/* Add these styles to your CSS file */
+
+.flex {
+    display: flex;
+  }
+  
+  .w-60 {
+    width: 15rem;
+  }
+  
+  .h-full {
+    height: 100%;
+  }
+  
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
+  
+  .p-2 {
+    padding: 0.5rem;
+  }
+  
+  .border-r {
+    border-right: 1px solid #ddd;
+  }
+  
+  .bg-gray-100 {
+    background-color: #f7fafc;
+  }
+  
+  .p-4 {
+    padding: 1rem;
+  }
+  
+  .drop-area {
+    flex: 1;
+  }
+  
+  .dropped-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #4299e1;
+    color: #fff;
+    border-radius: 0.25rem;
+  }
+  
