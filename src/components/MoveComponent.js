@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSpring, animated } from "@react-spring/web";
 import CatSprite from "./CatSprite";
 
@@ -15,45 +15,52 @@ export default function MoveComponent({
 
   const catSpriteRef = useRef(null);
 
-  useEffect(() => {
-    if (replayFlag === true && actions.length > 0) {
-      for (let i = 0; i < actions.length; i++) {
-        performAction(actions[i]);
-        setCurrentActionIndex(i + 1);
+  // Memoize performAction to avoid re-creating the function on every render
+  const performAction = useCallback(
+    (action) => {
+      switch (action.name) {
+        case "Move 10 steps":
+          setAnimationProps((prev) => ({ x: prev.x.get() + 10 }));
+          break;
+        case "Turn 15 degrees":
+          setAnimationProps((prev) => ({ rotateZ: prev.rotateZ.get() + 15 }));
+          break;
+        case "Go to x: 100, y: 100":
+          setAnimationProps({ x: 100, y: 100 });
+          break;
+        default:
+          break;
       }
-    }
-    onReplayComplete();
-  }, [replayFlag]);
+      setTimeout(() => {
+        setCurrentActionIndex((prevIndex) => prevIndex + 1);
+      }, 500);
+    },
+    [setAnimationProps]
+  );
 
+  // Use effect for replayFlag
+  useEffect(() => {
+    if (replayFlag && actions.length > 0) {
+      actions.forEach((action, i) => {
+        setTimeout(() => {
+          performAction(action);
+          setCurrentActionIndex(i + 1);
+        }, i * 500);
+      });
+      onReplayComplete();
+    }
+  }, [replayFlag, actions, performAction, onReplayComplete]);
+
+  // Use effect for actions
   useEffect(() => {
     if (
-      replayFlag === false &&
+      !replayFlag &&
       actions.length > 0 &&
       currentActionIndex < actions.length
     ) {
       performAction(actions[currentActionIndex]);
     }
-  }, [actions, currentActionIndex]);
-
-  const performAction = (action) => {
-    switch (action.name) {
-      case "Move 10 steps":
-        setAnimationProps({ x: animationProps.x.get() + 10 });
-        break;
-      case "Turn 15 degrees":
-        setAnimationProps({ rotateZ: animationProps.rotateZ.get() + 15 });
-        break;
-      case "Go to x: 100, y: 100":
-        setAnimationProps({ x: 100, y: 100 });
-        break;
-      default:
-        break;
-    }
-
-    setTimeout(() => {
-      setCurrentActionIndex((prevIndex) => prevIndex + 1);
-    }, 500);
-  };
+  }, [actions, currentActionIndex, performAction, replayFlag]);
 
   return (
     <div className="flex-1 h-screen overflow-hidden flex flex-row bg-green border border-gray-200 rounded-xl ml-2 p-10">
